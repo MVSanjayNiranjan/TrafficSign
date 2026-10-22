@@ -1,0 +1,34 @@
+train 35220 | val 3989 | test 12630 | device cuda
+parameters: 4.51 M
+epoch  1/30 | loss 2.7324 | train 0.3470 | val 0.8689 |    33s  *saved*
+epoch  2/30 | loss 1.0772 | train 0.9153 | val 0.9855 |    45s  *saved*
+epoch  3/30 | loss 0.8843 | train 0.9718 | val 0.9865 |    56s  *saved*
+epoch  4/30 | loss 0.8533 | train 0.9768 | val 0.9862 |    67s
+epoch  5/30 | loss 0.8137 | train 0.9849 | val 0.9950 |    79s  *saved*
+epoch  6/30 | loss 0.7976 | train 0.9875 | val 0.9860 |    90s
+epoch  7/30 | loss 0.7737 | train 0.9913 | val 0.9970 |   101s  *saved*
+epoch  8/30 | loss 0.7709 | train 0.9917 | val 0.9902 |   113s
+epoch  9/30 | loss 0.7644 | train 0.9926 | val 0.9917 |   124s
+epoch 10/30 | loss 0.7609 | train 0.9923 | val 0.9962 |   135s
+epoch 11/30 | loss 0.7545 | train 0.9939 | val 0.9965 |   146s
+epoch 12/30 | loss 0.7532 | train 0.9938 | val 0.9960 |   158s
+epoch 13/30 | loss 0.7425 | train 0.9953 | val 0.9882 |   169s
+epoch 14/30 | loss 0.7410 | train 0.9954 | val 0.9952 |   180s
+epoch 15/30 | loss 0.7360 | train 0.9964 | val 0.9987 |   191s  *saved*
+epoch 16/30 | loss 0.7426 | train 0.9939 | val 0.9960 |   202s
+epoch 17/30 | loss 0.7349 | train 0.9963 | val 0.9967 |   214s
+epoch 18/30 | loss 0.7281 | train 0.9974 | val 0.9962 |   225s
+epoch 19/30 | loss 0.7282 | train 0.9969 | val 0.9965 |   236s
+epoch 20/30 | loss 0.7258 | train 0.9975 | val 0.9967 |   247s
+epoch 21/30 | loss 0.7231 | train 0.9977 | val 0.9987 |   259s  *saved*
+epoch 22/30 | loss 0.7235 | train 0.9975 | val 0.9982 |   270s
+epoch 23/30 | loss 0.7218 | train 0.9975 | val 0.9967 |   281s
+epoch 24/30 | loss 0.7199 | train 0.9981 | val 0.9987 |   292s  *saved*
+epoch 25/30 | loss 0.7186 | train 0.9983 | val 0.9985 |   303s
+epoch 26/30 | loss 0.7173 | train 0.9985 | val 0.9977 |   315s
+epoch 27/30 | loss 0.7171 | train 0.9984 | val 0.9982 |   326s
+epoch 28/30 | loss 0.7168 | train 0.9985 | val 0.9982 |   337s
+epoch 29/30 | loss 0.7172 | train 0.9984 | val 0.9982 |   348s
+epoch 30/30 | loss 0.7168 | train 0.9983 | val 0.9982 |   359s
+
+Best val acc 0.9987 | TEST ACCURACY 0.9967 (99.67%)

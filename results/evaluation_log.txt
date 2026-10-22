@@ -1,0 +1,27 @@
+Loaded 3 model(s); test set: 12630 images
+
+  single model 0:            99.67%
+  single model 1:            99.73%
+  single model 2:            99.77%
+  ensemble (3 models):        99.83%
+  ensemble + test-time aug:   99.84%   <-- final system
+  errors: 20 / 12630
+
+Confidence threshold analysis (reject = 'uncertain, rely on other sensors/map'):
+  conf >= 0.50: answers  99.21% of signs, accuracy on those 99.960%
+  conf >= 0.60: answers  98.77% of signs, accuracy on those 99.968%
+  conf >= 0.70: answers  98.32% of signs, accuracy on those 99.968%
+  conf >= 0.80: answers  97.34% of signs, accuracy on those 99.967%
+  conf >= 0.85: answers  96.41% of signs, accuracy on those 99.967%
+
+Robustness under simulated driving conditions:
+  clean                 99.83%
+  night (dark)          99.71%
+  glare (bright)        96.34%
+  fog                   99.53%
+  blur                  99.78%
+  sensor noise          99.48%
+  low resolution        99.08%
+  occlusion (sticker)   78.42%
+
+Saved reports and figures to C:\Users\sanja\AI\traffic_sign_recognition\results

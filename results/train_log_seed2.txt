@@ -1,0 +1,34 @@
+train 39209 | val 0 | test 12630 | device cuda
+parameters: 4.51 M
+epoch  1/30 | loss 2.6989 | train 0.3554 | val nan |    27s  *saved*
+epoch  2/30 | loss 1.0716 | train 0.9153 | val nan |    39s  *saved*
+epoch  3/30 | loss 0.8779 | train 0.9732 | val nan |    52s  *saved*
+epoch  4/30 | loss 0.8498 | train 0.9774 | val nan |    64s  *saved*
+epoch  5/30 | loss 0.8150 | train 0.9841 | val nan |    77s  *saved*
+epoch  6/30 | loss 0.7870 | train 0.9890 | val nan |    89s  *saved*
+epoch  7/30 | loss 0.7797 | train 0.9900 | val nan |   102s  *saved*
+epoch  8/30 | loss 0.7718 | train 0.9912 | val nan |   114s  *saved*
+epoch  9/30 | loss 0.7593 | train 0.9935 | val nan |   127s  *saved*
+epoch 10/30 | loss 0.7584 | train 0.9928 | val nan |   139s  *saved*
+epoch 11/30 | loss 0.7510 | train 0.9945 | val nan |   152s  *saved*
+epoch 12/30 | loss 0.7487 | train 0.9940 | val nan |   164s  *saved*
+epoch 13/30 | loss 0.7446 | train 0.9952 | val nan |   177s  *saved*
+epoch 14/30 | loss 0.7449 | train 0.9943 | val nan |   189s  *saved*
+epoch 15/30 | loss 0.7407 | train 0.9948 | val nan |   201s  *saved*
+epoch 16/30 | loss 0.7366 | train 0.9958 | val nan |   214s  *saved*
+epoch 17/30 | loss 0.7340 | train 0.9960 | val nan |   226s  *saved*
+epoch 18/30 | loss 0.7329 | train 0.9959 | val nan |   239s  *saved*
+epoch 19/30 | loss 0.7299 | train 0.9967 | val nan |   251s  *saved*
+epoch 20/30 | loss 0.7248 | train 0.9975 | val nan |   264s  *saved*
+epoch 21/30 | loss 0.7247 | train 0.9971 | val nan |   276s  *saved*
+epoch 22/30 | loss 0.7234 | train 0.9972 | val nan |   289s  *saved*
+epoch 23/30 | loss 0.7207 | train 0.9977 | val nan |   301s  *saved*
+epoch 24/30 | loss 0.7175 | train 0.9986 | val nan |   313s  *saved*
+epoch 25/30 | loss 0.7177 | train 0.9980 | val nan |   326s  *saved*
+epoch 26/30 | loss 0.7176 | train 0.9982 | val nan |   338s  *saved*
+epoch 27/30 | loss 0.7157 | train 0.9985 | val nan |   351s  *saved*
+epoch 28/30 | loss 0.7158 | train 0.9988 | val nan |   363s  *saved*
+epoch 29/30 | loss 0.7152 | train 0.9986 | val nan |   376s  *saved*
+epoch 30/30 | loss 0.7144 | train 0.9989 | val nan |   388s  *saved*
+
+Best val acc -1.0000 | TEST ACCURACY 0.9977 (99.77%)
