@@ -8,7 +8,7 @@ import shutil
 from common import RESULTS_DIR, ROOT
 
 DOCS = ROOT / "docs"
-REPO_URL = "https://github.com/MVSanjayNiranjan/TrafficSign"
+REPO_URL = "https://github.com/Velerion/TrafficSign"
 CHARTS = ["confusion_matrix.png", "misclassified.png", "robustness.png", "training_curves_seed0.png"]
 ORT = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/"
 

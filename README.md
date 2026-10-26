@@ -4,7 +4,7 @@ Deep-learning system that recognises **43 classes of traffic signs** from camera
 trained and evaluated on the **German Traffic Sign Recognition Benchmark (GTSRB)**:
 39,209 training images and 12,630 test images of real road scenes.
 
-**Live demo: https://mvsanjayniranjan.github.io/TrafficSign/** (runs in your browser)
+**Live demo: https://velerion.github.io/TrafficSign/** (runs in your browser)
 
 **Final accuracy: 99.84% on the official GTSRB test set** (20 errors in 12,630 images).
 For reference, measured human performance on this benchmark is 98.84%.
