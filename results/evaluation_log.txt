@@ -24,4 +24,4 @@ Robustness under simulated driving conditions:
   low resolution        99.08%
   occlusion (sticker)   78.42%
 
-Saved reports and figures to C:\Users\sanja\AI\traffic_sign_recognition\results
+Saved reports and figures to results/

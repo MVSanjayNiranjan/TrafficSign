@@ -33,7 +33,7 @@ CLASS_NAMES = [
 
 
 def get_device():
-    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    return torch.device("cuda" if torch.cuda.is_available() and torch.cuda.device_count() > 0 else "cpu")
 
 
 # --------------------------------------------------------------------------- #
@@ -167,7 +167,7 @@ def load_models(device=None, paths=None):
     models = []
     for p in paths:
         m = TrafficSignNet().to(device)
-        ckpt = torch.load(p, map_location=device, weights_only=True)
+        ckpt = torch.load(p, map_location="cpu", weights_only=True)  # works on GPU and CPU-only hosts
         m.load_state_dict(ckpt["model"])
         m.eval()
         models.append(m)

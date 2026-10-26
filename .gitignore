@@ -1,5 +1,15 @@
+# Dataset (~600 MB, re-downloaded by data.py)
+data/
+# Python / tooling
 __pycache__/
 *.pyc
-data/
-*.pt
+.venv/
+venv/
+.ipynb_checkpoints/
+# Secrets and local config (never commit)
+.env
+.env.*
+*.key
+*.pem
+.claude/
 *.zip

@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Traffic sign recognition with a CNN + Spatial Transformer ensemble (99.84% on GTSRB), running in your browser.">
+<title>Traffic Sign Recognition</title>
+<style>
+  :root {
+    --bg: #f5f6f8; --card: #ffffff; --text: #16181d; --muted: #646b78; --line: #e3e6eb;
+    --accent: #2f6fe4; --accent-soft: #e7efff; --ok: #1a8a4a; --ok-soft: #e3f5ea;
+    --warn: #c5600f; --warn-soft: #fdeedf; --bar: #d9dee6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1115; --card: #181b21; --text: #e9ebef; --muted: #9aa1ad; --line: #2a2e36;
+      --accent: #6d9cff; --accent-soft: #1d2a45; --ok: #4cc47e; --ok-soft: #173123;
+      --warn: #f0a050; --warn-soft: #3a2817; --bar: #2c313a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.5 "Segoe UI", system-ui, -apple-system, sans-serif; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+  header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+  h1 { margin: 0; font-size: 26px; letter-spacing: -0.02em; }
+  .sub { color: var(--muted); margin: 2px 0 0; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 13px; color: var(--muted); }
+  .chip b { color: var(--text); }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+  .kpi .label { color: var(--muted); font-size: 13px; }
+  .kpi .value { font-size: 28px; font-weight: 650; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .kpi .note { color: var(--muted); font-size: 12px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px; margin-bottom: 16px; }
+  h2 { font-size: 16px; margin: 0 0 12px; }
+  .drop { border: 2px dashed var(--line); border-radius: 10px; padding: 28px 16px; text-align: center; cursor: pointer;
+          color: var(--muted); transition: border-color .15s, background .15s; }
+  .drop:hover, .drop.over { border-color: var(--accent); background: var(--accent-soft); }
+  .drop strong { color: var(--accent); }
+  .samples { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; margin-top: 14px; }
+  .samples button { padding: 0; border: 1px solid var(--line); border-radius: 8px; background: none; cursor: pointer; overflow: hidden; aspect-ratio: 1; }
+  .samples button:hover { outline: 2px solid var(--accent); }
+  .samples img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .empty { color: var(--muted); text-align: center; padding: 48px 0; }
+  .result-head { display: flex; gap: 16px; align-items: center; margin-bottom: 14px; }
+  .result-head img.preview { width: 96px; height: 96px; object-fit: contain; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); }
+  .pred { font-size: 22px; font-weight: 650; line-height: 1.25; }
+  .status { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; }
+  .status.OK { background: var(--ok-soft); color: var(--ok); }
+  .status.UNCERTAIN { background: var(--warn-soft); color: var(--warn); }
+  .bars .row { display: grid; grid-template-columns: minmax(0, 1fr) 64px; gap: 4px 10px; align-items: center; margin-bottom: 8px; font-size: 13px; }
+  .bars .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bars .pct { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .track { grid-column: 1 / -1; height: 8px; background: var(--bar); border-radius: 4px; overflow: hidden; }
+  .fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .4s ease; }
+  #bars .row:first-child .fill { background: var(--ok); }
+  .views { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+  .views figure { margin: 0; text-align: center; }
+  .views img { width: 96px; height: 96px; image-rendering: pixelated; border-radius: 6px; border: 1px solid var(--line); }
+  .views figcaption { font-size: 12px; color: var(--muted); max-width: 110px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .tabs button { border: 1px solid var(--line); background: none; color: var(--text); padding: 5px 12px; border-radius: 8px; cursor: pointer; font: inherit; font-size: 13px; }
+  .tabs button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .chart img { width: 100%; border-radius: 8px; background: #fff; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error { color: var(--warn); }
+  @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } .kpis { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Traffic Sign Recognition</h1>
+      <p class="sub">CNN + Spatial Transformer ensemble, trained on GTSRB (43 sign classes). Runs entirely in your browser: images never leave your device. <a href="https://github.com/MVSanjayNiranjan/TrafficSign" style="color:var(--accent)">Source code</a></p>
+    </div>
+    <div class="chips">
+      <span class="chip"><b>3</b> models</span>
+      <span class="chip">runs <b>in your browser</b></span>
+      <span class="chip">safety threshold <b>70%</b></span>
+    </div>
+  </header>
+
+  <section class="kpis">
+    <div class="card kpi"><div class="label">Test accuracy</div><div class="value" id="k-acc">–</div><div class="note">official GTSRB test set</div></div>
+    <div class="card kpi"><div class="label">Errors</div><div class="value" id="k-err">–</div><div class="note">out of 12,630 images</div></div>
+    <div class="card kpi"><div class="label">Accuracy when confident</div><div class="value" id="k-safe">–</div><div class="note" id="k-safe-note">at ≥ 70% confidence</div></div>
+    <div class="card kpi"><div class="label">This session</div><div class="value" id="k-count">0</div><div class="note" id="k-lat">predictions</div></div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <h2>Classify a sign</h2>
+      <label class="drop" id="drop">
+        <input type="file" id="file" accept="image/*" hidden>
+        <strong>Choose an image</strong> or drag it here<br>
+        <span class="muted">Best with a photo cropped around one sign</span>
+      </label>
+      <p class="muted" style="margin:14px 0 0">Or try a sample from the test set:</p>
+      <div class="samples" id="samples"></div>
+    </div>
+
+    <div class="card" id="result">
+      <h2>Prediction</h2>
+      <div class="empty" id="empty"><span class="spinner"></span> Loading neural network (54 MB, first visit only)… <span id="dl"></span></div>
+      <div id="out" hidden>
+        <div class="result-head">
+          <img class="preview" id="preview" alt="">
+          <div>
+            <div class="pred" id="pred"></div>
+            <span class="status" id="status"></span>
+            <div class="muted" id="meta"></div>
+          </div>
+        </div>
+        <div class="bars" id="bars"></div>
+        <div class="views">
+          <figure><img id="v-in" alt="Model input"><figcaption>Model input (48×48, contrast-stretched)</figcaption></figure>
+          <figure><img id="v-stn" alt="STN view"><figcaption>After Spatial Transformer alignment</figcaption></figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <h2>Robustness in difficult conditions</h2>
+      <div class="bars" id="robust"></div>
+    </div>
+    <div class="card">
+      <h2>Model comparison</h2>
+      <div class="bars" id="models"></div>
+      <h2 style="margin-top:18px">Confidence threshold trade-off</h2>
+      <table id="thr"><thead><tr><th>Threshold</th><th class="num">Signs answered</th><th class="num">Accuracy on answered</th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+
+  <section class="card" style="margin-bottom:16px">
+    <h2>Evaluation charts</h2>
+    <div class="tabs" id="tabs">
+      <button data-img="confusion_matrix.png" class="active">Confusion matrix</button>
+      <button data-img="training_curves_seed0.png">Training curves</button>
+      <button data-img="misclassified.png">Misclassified examples</button>
+      <button data-img="robustness.png">Robustness chart</button>
+    </div>
+    <div class="chart"><img id="chart" src="charts/confusion_matrix.png" alt="Evaluation chart"></div>
+  </section>
+
+  <section class="card">
+    <h2>Prediction history (this session)</h2>
+    <table id="hist"><thead><tr><th>Image</th><th>Prediction</th><th class="num">Confidence</th><th>Status</th><th class="num">Time</th></tr></thead><tbody></tbody></table>
+    <div class="empty" id="hist-empty" style="padding:20px 0">No predictions yet.</div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+const pct = (v, d = 2) => (v * 100).toFixed(d) + "%";
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const history = [];
+
+function bars(el, rows, digits = 2, scaleMin = 0) {
+  el.innerHTML = rows.map(([name, v]) => {
+    const w = Math.max(0, (v - scaleMin) / (1 - scaleMin)) * 100;
+    return `<div class="row"><span class="name" title="${esc(name)}">${esc(name)}</span><span class="pct">${pct(v, digits)}</span>
+            <div class="track"><div class="fill" style="width:${w}%"></div></div></div>`;
+  }).join("");
+}
+
+async function loadMetrics() {
+  const m = await (await fetch("metrics.json")).json();
+  if (!m.ensemble_tta) return;
+  $("k-acc").textContent = pct(m.ensemble_tta);
+  $("k-err").textContent = Math.round((1 - m.ensemble_tta) * 12630);
+  const t = m.threshold && (m.threshold["0.7"] || m.threshold["0.7"]);
+  if (t) { $("k-safe").textContent = pct(t.accuracy); $("k-safe-note").textContent = `answers ${pct(t.coverage, 1)} of signs`; }
+  bars($("robust"), Object.entries(m.robustness || {}).sort((a, b) => (b[0] === "clean") - (a[0] === "clean") || b[1] - a[1]).map(([k, v]) => [k[0].toUpperCase() + k.slice(1), v]), 2, 0.5);
+  const models = Object.keys(m).filter((k) => k.startsWith("model_")).map((k) => [`Single model ${k.split("_")[1]}`, m[k]]);
+  models.push(["Ensemble", m.ensemble], ["Ensemble + test-time aug", m.ensemble_tta]);
+  bars($("models"), models, 2, 0.99);
+  $("thr").querySelector("tbody").innerHTML = Object.entries(m.threshold || {}).map(([k, v]) =>
+    `<tr><td>≥ ${Math.round(k * 100)}%</td><td class="num">${pct(v.coverage, 1)}</td><td class="num">${pct(v.accuracy, 3)}</td></tr>`).join("");
+}
+
+const SAMPLES = ["no_entry.png", "pedestrians.png", "road_work.png", "roundabout.png", "speed_limit_30.png", "stop.png", "turn_right_ahead.png", "yield.png"];
+const CLASS_NAMES = ["Speed limit (20km/h)", "Speed limit (30km/h)", "Speed limit (50km/h)", "Speed limit (60km/h)", "Speed limit (70km/h)", "Speed limit (80km/h)", "End of speed limit (80km/h)", "Speed limit (100km/h)", "Speed limit (120km/h)", "No passing", "No passing for vehicles over 3.5 t", "Right-of-way at the next intersection", "Priority road", "Yield", "Stop", "No vehicles", "Vehicles over 3.5 t prohibited", "No entry", "General caution", "Dangerous curve to the left", "Dangerous curve to the right", "Double curve", "Bumpy road", "Slippery road", "Road narrows on the right", "Road work", "Traffic signals", "Pedestrians", "Children crossing", "Bicycles crossing", "Beware of ice/snow", "Wild animals crossing", "End of all speed and passing limits", "Turn right ahead", "Turn left ahead", "Ahead only", "Go straight or right", "Go straight or left", "Keep right", "Keep left", "Roundabout mandatory", "End of no passing", "End of no passing by vehicles over 3.5 t"];
+
+function loadSamples() {
+  $("samples").innerHTML = SAMPLES.map((f) =>
+    `<button title="${esc(f.replace(".png", "").replace(/_/g, " "))}" data-f="${esc(f)}"><img src="samples/${f}" alt=""></button>`).join("");
+  $("samples").querySelectorAll("button").forEach((b) => b.onclick = async () => {
+    const blob = await (await fetch(`samples/${b.dataset.f}`)).blob();
+    predict(new File([blob], b.dataset.f, { type: blob.type }));
+  });
+}
+
+const THRESHOLD = 0.7, S = 48;
+let session = null;
+
+async function loadModel() {
+  ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/";
+  const res = await fetch("model.onnx");
+  const total = +res.headers.get("content-length") || 54.4e6;
+  const reader = res.body.getReader();
+  const chunks = [];
+  let got = 0;
+  while (true) {
+    const step = await reader.read();
+    if (step.done) break;
+    chunks.push(step.value);
+    got += step.value.length;
+    $("dl").textContent = Math.min(100, Math.round(got / total * 100)) + "%";
+  }
+  const buf = new Uint8Array(got);
+  let o = 0;
+  for (const c of chunks) { buf.set(c, o); o += c.length; }
+  session = await ort.InferenceSession.create(buf, { executionProviders: ["wasm"] });
+  $("empty").textContent = "Upload an image or click a sample to see the result.";
+}
+
+function preprocess(img) {
+  const scale = Math.min(1, 512 / Math.max(img.width, img.height));
+  const w = Math.max(1, Math.round(img.width * scale)), h = Math.max(1, Math.round(img.height * scale));
+  const c1 = Object.assign(document.createElement("canvas"), { width: w, height: h });
+  const g1 = c1.getContext("2d", { willReadFrequently: true });
+  g1.drawImage(img, 0, 0, w, h);
+  const d = g1.getImageData(0, 0, w, h), p = d.data, n = w * h;
+  const Y = new Float32Array(n), hist = new Array(256).fill(0);
+  for (let i = 0; i < n; i++) {
+    const y = 0.299 * p[4 * i] + 0.587 * p[4 * i + 1] + 0.114 * p[4 * i + 2];
+    Y[i] = y; hist[Math.min(255, Math.round(y))]++;
+  }
+  let cut = Math.floor(n / 100);
+  for (let i = 0; i < 256 && cut > 0; i++) { const t = Math.min(cut, hist[i]); hist[i] -= t; cut -= t; }
+  cut = Math.floor(n / 100);
+  for (let i = 255; i >= 0 && cut > 0; i--) { const t = Math.min(cut, hist[i]); hist[i] -= t; cut -= t; }
+  let lo = 0, hi = 255;
+  while (lo < 255 && hist[lo] === 0) lo++;
+  while (hi > 0 && hist[hi] === 0) hi--;
+  const sc = hi > lo ? 255 / (hi - lo) : 1, off = hi > lo ? -lo * sc : 0;
+  for (let i = 0; i < n; i++) {
+    const r = p[4 * i], g = p[4 * i + 1], b = p[4 * i + 2];
+    const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b, cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+    const y = Math.max(0, Math.min(255, Math.floor(Math.round(Y[i]) * sc + off)));
+    p[4 * i] = y + 1.402 * (cr - 128);
+    p[4 * i + 1] = y - 0.344136 * (cb - 128) - 0.714136 * (cr - 128);
+    p[4 * i + 2] = y + 1.772 * (cb - 128);
+  }
+  g1.putImageData(d, 0, 0);
+  const c2 = Object.assign(document.createElement("canvas"), { width: S, height: S });
+  const g2 = c2.getContext("2d", { willReadFrequently: true });
+  g2.imageSmoothingEnabled = true; g2.imageSmoothingQuality = "high";
+  g2.drawImage(c1, 0, 0, S, S);
+  const q = g2.getImageData(0, 0, S, S).data, x = new Float32Array(3 * S * S);
+  for (let i = 0; i < S * S; i++) for (let ch = 0; ch < 3; ch++) x[ch * S * S + i] = q[4 * i + ch] / 255;
+  return x;
+}
+
+function tensorToPng(arr) {
+  const c = Object.assign(document.createElement("canvas"), { width: S, height: S });
+  const g = c.getContext("2d"), im = g.createImageData(S, S);
+  for (let i = 0; i < S * S; i++) {
+    for (let ch = 0; ch < 3; ch++) im.data[4 * i + ch] = Math.round(arr[ch * S * S + i] * 255);
+    im.data[4 * i + 3] = 255;
+  }
+  g.putImageData(im, 0, 0);
+  return c.toDataURL();
+}
+
+async function runModel(file) {
+  const img = await createImageBitmap(file);
+  const t0 = performance.now();
+  const x = preprocess(img);
+  const out = await session.run({ image: new ort.Tensor("float32", x, [1, 3, S, S]) });
+  const probs = Array.from(out.probs.data);
+  const latency = performance.now() - t0;
+  const top5 = probs.map((c, id) => ({ id, name: CLASS_NAMES[id], conf: c }))
+    .sort((a, b) => b.conf - a.conf).slice(0, 5);
+  return {
+    label: top5[0].name, class_id: top5[0].id, confidence: top5[0].conf,
+    status: top5[0].conf >= THRESHOLD ? "OK" : "UNCERTAIN", top5, latency_ms: Math.round(latency),
+    input_url: tensorToPng(x), stn_url: tensorToPng(out.aligned.data),
+  };
+}
+
+async function predict(file) {
+  $("empty").hidden = false; $("out").hidden = true;
+  $("empty").innerHTML = '<span class="spinner"></span> Analysing…';
+  const url = URL.createObjectURL(file);
+  if (!session) { $("empty").innerHTML = '<span class="spinner"></span> Model still loading, please wait…'; return; }
+  let r;
+  try {
+    r = await runModel(file);
+  } catch (e) {
+    $("empty").innerHTML = '<span class="error">Could not read that file as an image.</span>';
+    return;
+  }
+  $("empty").hidden = true; $("out").hidden = false;
+  $("preview").src = url;
+  $("pred").textContent = r.status === "OK" ? r.label : `Best guess: ${r.label}`;
+  $("status").textContent = r.status === "OK" ? `Confident · ${pct(r.confidence, 1)}` : `Uncertain · ${pct(r.confidence, 1)}`;
+  $("status").className = "status " + r.status;
+  $("meta").textContent = `Class ${r.class_id} · ${r.latency_ms} ms`;
+  bars($("bars"), r.top5.map((t) => [t.name, t.conf]));
+  $("v-in").src = r.input_url;
+  $("v-stn").src = r.stn_url;
+
+  history.unshift({ name: file.name, ...r });
+  $("k-count").textContent = history.length;
+  const avg = history.reduce((s, h) => s + h.latency_ms, 0) / history.length;
+  $("k-lat").textContent = `predictions · avg ${avg.toFixed(0)} ms`;
+  $("hist-empty").hidden = true;
+  $("hist").querySelector("tbody").innerHTML = history.slice(0, 20).map((h) =>
+    `<tr><td>${esc(h.name)}</td><td>${esc(h.label)}</td><td class="num">${pct(h.confidence, 1)}</td>
+     <td><span class="status ${h.status}">${h.status}</span></td><td class="num">${h.latency_ms} ms</td></tr>`).join("");
+}
+
+$("file").onchange = (e) => e.target.files[0] && predict(e.target.files[0]);
+const drop = $("drop");
+["dragenter", "dragover"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", (e) => e.dataTransfer.files[0] && predict(e.dataTransfer.files[0]));
+$("tabs").querySelectorAll("button").forEach((b) => b.onclick = () => {
+  $("tabs").querySelectorAll("button").forEach((x) => x.classList.remove("active"));
+  b.classList.add("active"); $("chart").src = "charts/" + b.dataset.img;
+});
+
+loadMetrics(); loadSamples();
+loadModel().catch((e) => { $("empty").innerHTML = `<span class="error">Could not load the model: ${esc(e.message)}</span>`; });
+</script>
+</body>
+</html>

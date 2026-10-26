@@ -1,0 +1,5 @@
+data/
+__pycache__/
+*.pyc
+results/train_log_*
+results/history_*

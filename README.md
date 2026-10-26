@@ -4,6 +4,8 @@ Deep-learning system that recognises **43 classes of traffic signs** from camera
 trained and evaluated on the **German Traffic Sign Recognition Benchmark (GTSRB)**:
 39,209 training images and 12,630 test images of real road scenes.
 
+**Live demo: https://mvsanjayniranjan.github.io/TrafficSign/** (runs in your browser)
+
 **Final accuracy: 99.84% on the official GTSRB test set** (20 errors in 12,630 images).
 For reference, measured human performance on this benchmark is 98.84%.
 
@@ -34,6 +36,9 @@ camera image -> sign crop -> preprocessing -> [ ensemble of CNNs with Spatial Tr
 | `evaluate.py` | Test accuracy, per-class report, confusion matrix, robustness tests, threshold analysis |
 | `predict.py` | Command-line prediction for image files |
 | `app.py` | Desktop GUI: open an image and see the prediction |
+| `web_app.py`, `templates/` | Web dashboard (Flask) |
+| `Dockerfile`, `requirements-web.txt` | Deploy the web dashboard to any cloud host |
+| `export_onnx.py`, `build_site.py`, `docs/` | In-browser version of the dashboard (GitHub Pages) |
 
 ## Usage
 
@@ -52,6 +57,41 @@ Every `models/model_seed*.pt` file is automatically used in the ensemble.
 
 > If the dataset download hangs, your network may have broken IPv6. Download the three
 > GTSRB archives manually (e.g. `curl -4 ...`) into `data/gtsrb/` and `data/gtsrb_full/`.
+
+## Web dashboard
+
+```bash
+python web_app.py        # then open http://localhost:7860
+```
+
+Upload or drag in an image (or click a sample) to see the prediction, top-5 confidence bars,
+the 48×48 model input and the Spatial Transformer's aligned view. The page also shows test
+accuracy, robustness, model comparison, the confidence-threshold trade-off, evaluation charts
+and a history of this session's predictions.
+
+### Live demo on GitHub Pages (no server)
+
+`export_onnx.py` converts the 3-model ensemble (with test-time augmentation and the Spatial
+Transformer view) into one ONNX file. ONNX test accuracy is 99.84%, identical to PyTorch.
+`build_site.py` turns the dashboard into a static site in `docs/` that runs the model in the
+browser with ONNX Runtime Web, so uploaded images never leave the visitor's device.
+GitHub Pages serves `docs/` from the `main` branch.
+
+```bash
+python export_onnx.py
+python build_site.py
+```
+
+### Alternative: Flask server on Hugging Face Spaces
+
+1. Create a free account at huggingface.co, then **New Space**, choose **Docker** SDK, **Blank** template.
+2. Upload this folder's `Dockerfile`, `requirements-web.txt`, `common.py`, `web_app.py`,
+   `templates/`, `models/`, `samples/` and the files in `results/` the Dockerfile lists
+   (drag-and-drop in the Space's **Files** tab works; model files over 10 MB are stored with Git LFS automatically).
+3. The Space builds the image and serves the dashboard at `https://<user>-<space>.hf.space`.
+
+The same `Dockerfile` works on Render, Railway, Google Cloud Run or any Docker host
+(it reads the `PORT` environment variable). Inference runs on the CPU, at roughly 100–300 ms per image.
 
 ## Results
 
